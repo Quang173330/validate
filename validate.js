@@ -50,7 +50,7 @@
             },
             format: {
                 pattern: "[0-9]+",
-                message: "can only contain a-z and 0-9",
+                message: "can only contain 0-9",
             },
         },
         birthday: {
@@ -63,6 +63,10 @@
             }
         },
         size: {
+            exclusion: {
+                within: ["nickolas", "ellen"],
+                message: "'%{value}' is not allowed"
+            },
             inclusion: {
                 within: ["small", "medium", "large"],
                 message: "^We're currently out of %{value}"
@@ -72,7 +76,8 @@
 
     $('#form').submit((e) => {
         e.preventDefault()
-        let errors = validate($('#form'), constraints) || {}
+        let errors = validate($('#form'), constraints, {format: "detailed"}) || {}
+        console.log(errors)
         $('#error-name').html(errors.name)
         $('#error-size').html(errors.size)
         $('#error-email').html(errors.email)
@@ -80,9 +85,11 @@
         $('#error-confirm-password').html(errors['confirm-password'])
         $('#error-phone').html(errors.phone)
         $('#error-birthday').html(errors.birthday)
+
     })
     $('#email').blur(() => {
         let error = validate.single($('#email').val(), constraints.email) || [''];
+        console.log(error);
         $('#error-email').html(error[0])
     })
 
@@ -113,7 +120,10 @@
         }
         let confirmPassword = $('#confirm-password').val();
         let password = $('#password').val()
-        let error = validate({confirmPassword, password}, constraintsConfirm) || {};
+        let confirmMessage = {
+            confirmPassword: ''
+        }
+        let error = validate({confirmPassword, password}, constraintsConfirm) || confirmMessage;
         console.log(error)
         $('#error-confirm-password').html(error.confirmPassword)
     })
